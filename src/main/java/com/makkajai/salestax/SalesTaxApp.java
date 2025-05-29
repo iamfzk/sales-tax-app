@@ -1,12 +1,13 @@
 package com.makkajai.salestax;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class SalesTaxApp {
+
     public static void main(String[] args) {
         List<String> input1 = Arrays.asList(
                 "1 book at 12.49",
@@ -73,12 +74,14 @@ class Item {
 
     public void calculateTaxes() {
         BigDecimal taxRate = BigDecimal.ZERO;
+
         if (!isExempt()) {
-            taxRate = taxRate.add(new BigDecimal("0.10"));
+            taxRate = taxRate.add(new BigDecimal("0.10")); // Basic sales tax
         }
         if (isImported()) {
-            taxRate = taxRate.add(new BigDecimal("0.05"));
+            taxRate = taxRate.add(new BigDecimal("0.05")); // Import duty
         }
+
         BigDecimal rawTax = price.multiply(taxRate);
         tax = roundUpToNearestPoint05(rawTax);
     }
@@ -88,7 +91,7 @@ class Item {
     }
 
     public BigDecimal getTotalPrice() {
-        return (price.add(tax)).multiply(new BigDecimal(quantity));
+        return price.add(tax).multiply(new BigDecimal(quantity));
     }
 
     public boolean isImported() {
@@ -96,11 +99,12 @@ class Item {
     }
 
     public boolean isExempt() {
-        return name.matches("(?i).*(book|chocolate|pill).*"); // ✅ Fixed quote
+        return name.matches("(?i).*(book|chocolate|pill).*");
     }
 
     private BigDecimal roundUpToNearestPoint05(BigDecimal value) {
-        return new BigDecimal(Math.ceil(value.doubleValue() * 20) / 20).setScale(2, RoundingMode.HALF_UP);
+        return new BigDecimal(Math.ceil(value.doubleValue() * 20) / 20)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
